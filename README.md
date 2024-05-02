@@ -11,3 +11,4 @@ The purpose of this program is to automate several tasks upon execution:
 
 By implementing this functionality, users can conveniently start using the text editor directly without the need to manually open it. Additionally, they can monitor the time they spend inside the editor accurately and stop the timer when they finish.
 
+![Video](https://github.com/noone313/vscode-timer-v2/blob/main/Untitled%20video%20-%20Made%20with%20Clipchamp%20(4).mp4)
