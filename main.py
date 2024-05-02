@@ -3,6 +3,8 @@ import psutil
 import time
 import pygetwindow as gw
 import threading
+import os
+from win32com.client import Dispatch
 
 class VSCodeTimeCounter:
     def __init__(self, root):
@@ -26,6 +28,9 @@ class VSCodeTimeCounter:
 
         # Start monitoring VS Code
         threading.Thread(target=self.monitor_vscode).start()
+
+        # Create startup shortcut
+        self.create_startup_shortcut()
 
     def get_vscode_window(self):
         vscode_windows = gw.getWindowsWithTitle("Visual Studio Code")
@@ -58,7 +63,7 @@ class VSCodeTimeCounter:
                 self.start_counter()
                 break
 
-    def start_counter(self):  # يجب تحريك هذه الدالة إلى هنا
+    def start_counter(self):
         self.running = True
         threading.Thread(target=self.measure_vscode_time).start()
 
@@ -71,8 +76,10 @@ class VSCodeTimeCounter:
                     break
             if not vscode_running and self.running:
                 self.stop_counter()
+                self.root.withdraw()  # إخفاء النافذة عند إغلاق VS Code
             elif vscode_running and not self.running:
                 self.start_counter()
+                self.root.deiconify()  # عرض النافذة عندما يتم فتح VS Code
             time.sleep(5)
 
     def show_popup(self, message):
@@ -82,6 +89,15 @@ class VSCodeTimeCounter:
         popup.resizable(False, False)
         popup_label = tk.Label(popup, text=message, font=("Helvetica", 14))
         popup_label.pack(pady=20)
+
+    def create_startup_shortcut(self):
+        target_program_path = os.path.join(os.environ["APPDATA"], "Microsoft\Windows\Start Menu\Programs\Startup")
+        shortcut_path = os.path.join(target_program_path, "VSCode_Time_Counter.lnk")
+        shell = Dispatch('WScript.Shell')
+        shortcut = shell.CreateShortCut(shortcut_path)
+        shortcut.Targetpath = os.path.abspath(__file__)
+        shortcut.Arguments = ""
+        shortcut.save()
 
 if __name__ == "__main__":
     root = tk.Tk()
